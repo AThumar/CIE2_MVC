@@ -1,23 +1,38 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;  // Required for ToListAsync()
-using System.Threading.Tasks;        // Required for async/await
-using CIE2_MVC.Models;               // Ensure this is your namespace where BookShopContext is defined
+using Microsoft.EntityFrameworkCore;
+using CIE2_MVC.Models;
 
-namespace CIE2_MVC.Controllers
+public class BooksController : Controller
 {
-    public class BooksController : Controller
+    private readonly BookShopContext _context;
+
+    public BooksController(BookShopContext context)
     {
-        private readonly BookShopContext _context;
-
-        public BooksController(BookShopContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Books.ToListAsync());
-        }
+        _context = context;
     }
 
+    // Show all books
+    public async Task<IActionResult> Index()
+    {
+        return View(await _context.Books.Include(b => b.Category).ToListAsync());
+    }
+
+    // Create Book (GET)
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+    // Create Book (POST)
+    [HttpPost]
+    public async Task<IActionResult> Create(Book book)
+    {
+        if (ModelState.IsValid)
+        {
+            _context.Books.Add(book);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        return View(book);
+    }
 }

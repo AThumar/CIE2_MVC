@@ -8,6 +8,9 @@
         public decimal Price { get; set; }
         public string Genre { get; set; }
         public string CoverImageUrl { get; set; }
+        public int CategoryId { get; set; }
+        public Category Category { get; set; }
     }
+
 
 }
